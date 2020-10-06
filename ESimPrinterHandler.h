@@ -6,6 +6,7 @@ typedef struct
 {
     FILE *fp;
     String currentCommand;
+    int finish;
 } ESimReader;
 
 ESimReader *openESimCommandFile(char *fileName)
@@ -28,6 +29,7 @@ ESimReader *openESimCommandFile(char *fileName)
 
     obj->fp = fp;
     obj->currentCommand.length = 0;
+    obj->finish = 1;
 
     return obj;
 }
@@ -50,7 +52,15 @@ char *readESimCommand(ESimReader *obj)
     char buffer[bufferSize];
     char *b = buffer;
 
-    getline(&b, &bufferSize, obj->fp);
+    int finish = getline(&b, &bufferSize, obj->fp);
+
+    if(finish == -1)
+    {
+        obj->finish = 0;
+        buffer[0] = '\0';
+        SetString(&(obj->currentCommand), buffer);
+        return obj->currentCommand.data;
+    }
 
     /* Find end of line */
     for(int i = 0; i < bufferSize; i++)
