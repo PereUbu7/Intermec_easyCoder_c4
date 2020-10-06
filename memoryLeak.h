@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define __FILE__ "memoryLeak.h"
-#define __FUNC__ "none"
-#define __LINE__ -1
-
 typedef struct allocMem
 {
     void *p;
@@ -30,7 +26,7 @@ void printMemoryAllocationList()
     }
     else
     {
-        printf("Detected memory leaks:\n");
+        printf("Detected memory %i leaks:\n", numberOfEntries);
 
         AllocMem *entry = memoryAllocList;
         while(entry != NULL)
@@ -57,7 +53,7 @@ void *my_malloc(size_t size, const char *file, int line, const char *func)
     AllocMem *lastEntry = memoryAllocList;
 
     /* Go to last */
-    while(lastEntry != NULL) 
+    while(lastEntry != NULL && lastEntry->next != NULL) 
     {
         lastEntry = lastEntry->next; 
     }
@@ -103,19 +99,33 @@ void my_free(void *p, const char *file, int line, const char *func)
     if(entry == NULL)
     {
         perror("Couldn't find memory block to free");
+        return;
     }
     else
     {
         printf("Freed = %s, %i, %s, %p[%li]\n", file, line, func, p, entry->size);
 
-        if(prevEntry == NULL)
+        /* If removing only entry */
+        if(prevEntry == NULL && entry->next == NULL)
         {
             memoryAllocList = NULL;
         }
+        /* If removing first entry */
+        else if(prevEntry == NULL)
+        {
+            memoryAllocList = entry;
+        }
+        /* If removing middle entry */
         else if(entry->next != NULL)
         {
             prevEntry->next = entry->next;
         }
+        /* Removing last entry */
+        else
+        {
+            prevEntry->next = NULL;
+        }
+        
 
         numberOfEntries--;
 
@@ -127,5 +137,5 @@ void my_free(void *p, const char *file, int line, const char *func)
 
 #undef malloc
 #undef free
-#define malloc(X) my_malloc(X, __FILE__, __LINE__, __FUNCTION__)
-#define free(X) my_free(X, __FILE__, __LINE__, __FUNCTION__)
+#define malloc(X) my_malloc(X, __FILE__, __LINE__, __func__)
+#define free(X) my_free(X, __FILE__, __LINE__, __func__)

@@ -5,7 +5,7 @@
 #include <errno.h> /* Error number definitions */
 #include <termios.h> /* POSIX terminal control definitions */
 
-#include "data.h"
+#include "ESimPrinterHandler.h"
 
 /*
  * 'open_port()' - Open serial port 1.
@@ -35,14 +35,14 @@ int open_port(char* port)
     return (fd);
 }
 
-void write_port(int fd, Data* d)
-{
-    int n;
-    n = write(fd, d->data, d->length);
+// void write_port(int fd, Data* d)
+// {
+//     int n;
+//     n = write(fd, d->data, d->length);
 
-    if(n < 0)
-        fputs("write_port() failed\n", stderr);
-}
+//     if(n < 0)
+//         fputs("write_port() failed\n", stderr);
+// }
 
 void close_port(int fd)
 {
@@ -51,14 +51,24 @@ void close_port(int fd)
 
 int main()
 {
-    InitData(data);
+    ESimReader *reader = openESimCommandFile("command.esim");
+    
+    readESimCommand(reader);
+    printf("%s\n", reader->currentCommand.data);
 
-    SetData(&data, "Hej");
-    printf("%s\n", (&data)->data);
+    readESimCommand(reader);
+    printf("%s\n", reader->currentCommand.data);
 
-    SetData(&data, "C");
-    printf("%s\n", (&data)->data);
+    closeESimCommandFile(reader);
 
-    SetData(&data, "Nu ar det langt");
-    printf("%s\n", (&data)->data);
+    // InitData(data);
+
+    // SetData(&data, "Hej");
+    // printf("%s\n", (&data)->data);
+
+    // SetData(&data, "C");
+    // printf("%s\n", (&data)->data);
+
+    // SetData(&data, "Nu ar det langt");
+    // printf("%s\n", (&data)->data);
 }

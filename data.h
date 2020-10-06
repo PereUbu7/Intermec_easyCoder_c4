@@ -3,19 +3,16 @@
 
 #include "memoryLeak.h"
 
-#define __FILE__ "data.h"
-
 typedef struct
 {
     char *data;
     int length;
-} Data;
+} String;
 
 #define InitData(X) Data X = {.length = 0}
 
-int SetData(Data *d, char *text)
+int SetString(String *d, char *text)
 {
-    #define __FUNC__ "SetData"
 
     int n = 0;
 
@@ -26,15 +23,21 @@ int SetData(Data *d, char *text)
     if(d->length != n)
     {
         /* Free old data before allocating more */
-        #define __LINE__ 29
         free(d->data);
 
         /* Allocate memory for text */
-        #define __LINE__ 33
         d->data = (char*)malloc(n);
 
         d->length = n;
     }
 
     strcpy(d->data, text);
+
+    return n;
+}
+
+void FreeString(String *d)
+{
+    free(d->data);
+    d->length = 0;
 }
