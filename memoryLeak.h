@@ -76,6 +76,41 @@ void *my_malloc(size_t size, const char *file, int line, const char *func)
     return p;
 }
 
+/* TODO: TEST */
+void *my_realloc(void *p, size_t size, const char *file, int line, const char *func)
+{
+    if(!init)
+    {
+        atexit(printMemoryAllocationList);
+        init = 1;
+    }
+
+    AllocMem *entry = memoryAllocList;
+
+    /* Find matching entry */
+    while(entry != NULL && entry->p != p) 
+    { 
+        entry = entry->next; 
+    }
+
+    if(entry == NULL)
+    {
+        perror("Couldn't find memory block to realloc");
+        return NULL;
+    }
+    else
+    {
+        p = realloc(p, size);
+        printf("Reallocated = %s, %i, %s, %p[%li]\n", file, line, func, p, size);
+
+        strcpy(entry->file, file);
+        strcpy(entry->func, func);
+        entry->line = line;
+        entry->size = size;
+    }
+    return entry->p;
+}
+
 void *my_calloc(size_t size, const char *file, int line, const char *func)
 {
     my_malloc(size, file, line, func);
@@ -142,7 +177,9 @@ void my_free(void *p, const char *file, int line, const char *func)
 
 #undef malloc
 #undef calloc
+#undef realloc
 #undef free
 #define malloc(X) my_malloc(X, __FILE__, __LINE__, __func__)
 #define calloc(X) my_calloc(X, __FILE__, __LINE__, __func__)
+#define realloc(X, Y) my_realloc(X, Y, __FILE__, __LINE__, __func__)
 #define free(X) my_free(X, __FILE__, __LINE__, __func__)
