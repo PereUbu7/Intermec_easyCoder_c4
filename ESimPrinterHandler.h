@@ -32,7 +32,7 @@ ESimReader *openESimCommandFile(char *fileName)
     return obj;
 }
 
-int readESimCommand(ESimReader *obj)
+char *readESimCommand(ESimReader *obj)
 {
     if(obj == NULL)
     {
@@ -77,6 +77,8 @@ int readESimCommand(ESimReader *obj)
     buffer[bufferSize-1] = '\0';
 
     SetString(&(obj->currentCommand), buffer);
+
+    return obj->currentCommand.data;
 }
 
 int closeESimCommandFile(ESimReader *reader)

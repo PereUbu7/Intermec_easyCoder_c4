@@ -53,11 +53,8 @@ int main()
 {
     ESimReader *reader = openESimCommandFile("command.esim");
     
-    readESimCommand(reader);
-    printf("%s\n", reader->currentCommand.data);
-
-    readESimCommand(reader);
-    printf("%s\n", reader->currentCommand.data);
+    printf("%s\n", readESimCommand(reader));
+    printf("%s\n", readESimCommand(reader));
 
     closeESimCommandFile(reader);
 
