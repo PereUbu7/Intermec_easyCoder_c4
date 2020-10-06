@@ -76,6 +76,11 @@ void *my_malloc(size_t size, const char *file, int line, const char *func)
     return p;
 }
 
+void *my_calloc(size_t size, const char *file, int line, const char *func)
+{
+    my_malloc(size, file, line, func);
+}
+
 void my_free(void *p, const char *file, int line, const char *func)
 {
     if(!init)
@@ -136,6 +141,8 @@ void my_free(void *p, const char *file, int line, const char *func)
 }
 
 #undef malloc
+#undef calloc
 #undef free
 #define malloc(X) my_malloc(X, __FILE__, __LINE__, __func__)
+#define calloc(X) my_calloc(X, __FILE__, __LINE__, __func__)
 #define free(X) my_free(X, __FILE__, __LINE__, __func__)
